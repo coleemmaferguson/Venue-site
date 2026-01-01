@@ -1,41 +1,21 @@
-// netlify/functions/venues.js
-
-// Netlify functions run on Node 18+ so global fetch is available.
+// api/venues.js
 
 export default async function handler(req, res) {
   try {
-    const { city, minRating } = req.query || {};
-
     const apiKey = process.env.AIRTABLE_API_KEY;
     const baseId = process.env.AIRTABLE_BASE_ID;
     const tableName = process.env.AIRTABLE_TABLE_NAME || "Venues";
 
     if (!apiKey || !baseId) {
-      return res.status(500).json({ error: "Missing Airtable config" });
+      console.error("Missing Airtable config", { apiKey: !!apiKey, baseId: !!baseId });
+      return res.status(500).json({ 
+        error: "Missing Airtable config. Check AIRTABLE_API_KEY and AIRTABLE_BASE_ID env vars." 
+      });
     }
 
-    const formulaParts = ['{Status} = "Approved"'];
-
-    if (city) {
-      const safeCity = city.replace(/"/g, '\\"');
-      formulaParts.push(`FIND(LOWER("${safeCity}"), LOWER({City}))`);
-    }
-
-    if (minRating) {
-      const ratingNum = Number(minRating);
-      if (!isNaN(ratingNum)) {
-        formulaParts.push(`{Rating} >= ${ratingNum}`);
-      }
-    }
-
-    const filterFormula =
-      formulaParts.length === 1
-        ? formulaParts[0]
-        : `AND(${formulaParts.join(",")})`;
-
+    // For now: no filters, no view. Just grab up to 50 rows from the table.
     const params = new URLSearchParams({
-      filterByFormula: filterFormula,
-      maxRecords: "200",
+      maxRecords: "50",
     });
 
     const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(
@@ -43,15 +23,23 @@ export default async function handler(req, res) {
     )}?${params.toString()}`;
 
     const airtableRes = await fetch(url, {
-      headers: { Authorization: `Bearer ${apiKey}` },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
     });
 
+    const text = await airtableRes.text(); // read body either way
+
     if (!airtableRes.ok) {
-      console.error(await airtableRes.text());
-      return res.status(500).json({ error: "Failed to query Airtable" });
+      console.error("Airtable error:", airtableRes.status, text);
+      return res.status(500).json({
+        error: "Airtable error",
+        status: airtableRes.status,
+        details: text, // <- this is what we need to see
+      });
     }
 
-    const data = await airtableRes.json();
+    const data = JSON.parse(text);
 
     const records = data.records || [];
     const venues = records.map((r) => {
@@ -59,7 +47,7 @@ export default async function handler(req, res) {
       return {
         id: r.id,
         name: f["Name"] || "",
-        city: f["City"] || "",
+        city: f["City"] || f["Location"] || "",
         address: f["Address"] || "",
         website: f["Website"] || "",
         rating: typeof f["Rating"] === "number" ? f["Rating"] : null,
@@ -72,16 +60,12 @@ export default async function handler(req, res) {
       };
     });
 
-    const featured = venues.filter((v) => v.featured);
-    const nonFeatured = venues.filter((v) => !v.featured);
-
     return res.status(200).json({
-      featured,
-      venues: nonFeatured,
+      featured: [],
+      venues,
     });
   } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: "Server error" });
+    console.error("Server error:", e);
+    return res.status(500).json({ error: "Server error", details: String(e) });
   }
 }
-
