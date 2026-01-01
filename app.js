@@ -1,6 +1,6 @@
 async function fetchVenues(filters = {}) {
   const params = new URLSearchParams(filters);
-  const url = `/.netlify/functions/venues?${params.toString()}`;
+  const url = `/api/venues?${params.toString()}`;
 
   const res = await fetch(url);
   if (!res.ok) {
