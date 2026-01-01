@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wedding Venue Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <h1>Wedding Venue Finder</h1>
+      <p>Curated, human-approved venues. Updated automatically.</p>
+
+      <div class="filters">
+        <label>
+          City
+          <input id="filter-city" type="text" placeholder="e.g. Detroit" />
+        </label>
+
+        <label>
+          Min Rating
+          <select id="filter-rating">
+            <option value="0">Any</option>
+            <option value="4">4.0+</option>
+            <option value="4.5">4.5+</option>
+          </select>
+        </label>
+
+        <button id="filter-reset" type="button">Reset filters</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-main">
+    <section class="featured-section">
+      <h2>Featured Venues</h2>
+      <div id="featured-grid" class="venue-grid"></div>
+    </section>
+
+    <section class="all-section">
+      <h2>All Approved Venues</h2>
+      <div id="venue-grid" class="venue-grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built with Airtable + Netlify + vanilla HTML/CSS/JS.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
