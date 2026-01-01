@@ -26,18 +26,29 @@ function renderVenueCard(venue) {
       ? "$".repeat(venue.priceLevel || 1)
       : null;
 
+  const imageHTML = venue.photoRef
+    ? `<img class="venue-image" src="/api/place-photo?ref=${encodeURIComponent(
+        venue.photoRef
+      )}" alt="${venue.name || "Venue photo"}" />`
+    : "";
+
   card.innerHTML = `
+    ${imageHTML}
     <h3>${venue.name || "Untitled venue"}</h3>
     ${
       venue.city || venue.address
-        ? `<p>${[venue.city, venue.address].filter(Boolean).join(" • ")}</p>`
+        ? `<p>${[venue.city, venue.address]
+            .filter(Boolean)
+            .join(" • ")}</p>`
         : ""
     }
     <div class="venue-meta">
       ${
         typeof venue.rating === "number"
           ? `<span>⭐ ${venue.rating.toFixed(1)}${
-              venue.reviewCount ? ` (${venue.reviewCount} reviews)` : ""
+              venue.reviewCount
+                ? ` (${venue.reviewCount} reviews)`
+                : ""
             }</span>`
           : ""
       }
@@ -61,6 +72,7 @@ function renderVenueCard(venue) {
 
   return card;
 }
+
 
 function renderVenues(data) {
   const featuredGrid = document.getElementById("featured-grid");

@@ -137,3 +137,12 @@ body {
   font-size: 0.8rem;
   color: #777;
 }
+
+.venue-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
