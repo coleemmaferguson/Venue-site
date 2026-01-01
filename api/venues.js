@@ -57,6 +57,7 @@ export default async function handler(req, res) {
           typeof f["Price Level"] === "number" ? f["Price Level"] : null,
         tags: Array.isArray(f["Tags"]) ? f["Tags"] : [],
         featured: !!f["Featured"],
+        photoRef: f["Photo Ref"] || null,
       };
     });
 
