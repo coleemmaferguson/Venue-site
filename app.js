@@ -21,57 +21,20 @@ function renderVenueCard(venue) {
   const card = document.createElement("article");
   card.className = "venue-card";
 
-  const priceLabel =
-    typeof venue.priceLevel === "number" && venue.priceLevel >= 0
-      ? "$".repeat(venue.priceLevel || 1)
-      : null;
-
-  const imageHTML = venue.photoRef
-    ? `<img class="venue-image" src="/api/place-photo?ref=${encodeURIComponent(
-        venue.photoRef
-      )}" alt="${venue.name || "Venue photo"}" />`
+  const imageHTML = venue.imageUrl
+    ? `<img class="venue-image" src="${venue.imageUrl}" alt="${venue.name || "Venue"}" loading="lazy" />`
     : "";
 
   card.innerHTML = `
     ${imageHTML}
     <h3>${venue.name || "Untitled venue"}</h3>
-    ${
-      venue.city || venue.address
-        ? `<p>${[venue.city, venue.address]
-            .filter(Boolean)
-            .join(" • ")}</p>`
-        : ""
-    }
-    <div class="venue-meta">
-      ${
-        typeof venue.rating === "number"
-          ? `<span>⭐ ${venue.rating.toFixed(1)}${
-              venue.reviewCount
-                ? ` (${venue.reviewCount} reviews)`
-                : ""
-            }</span>`
-          : ""
-      }
-      ${priceLabel ? `<span>${priceLabel}</span>` : ""}
-    </div>
-    ${
-      venue.tags && venue.tags.length
-        ? `<p class="venue-tags">${venue.tags.join(" • ")}</p>`
-        : ""
-    }
-    ${
-      venue.website
-        ? `<a href="${
-            venue.website.startsWith("http")
-              ? venue.website
-              : "https://" + venue.website
-          }" target="_blank" rel="noopener noreferrer">Visit website</a>`
-        : ""
-    }
+    <p>${[venue.city, venue.address].filter(Boolean).join(" • ")}</p>
+    ${venue.website ? `<a href="${venue.website.startsWith("http") ? venue.website : "https://" + venue.website}" target="_blank" rel="noopener noreferrer">Visit website</a>` : ""}
   `;
 
   return card;
 }
+
 
 
 function renderVenues(data) {
