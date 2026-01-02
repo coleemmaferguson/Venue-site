@@ -14,9 +14,11 @@ export default async function handler(req, res) {
     }
 
     // For now: no filters, no view. Just grab up to 50 rows from the table.
-    const params = new URLSearchParams({
-      maxRecords: "50",
-    });
+const params = new URLSearchParams({
+  view: "Approved",
+  maxRecords: "200",
+});
+
 
     const url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(
       tableName
