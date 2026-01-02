@@ -59,7 +59,7 @@ const params = new URLSearchParams({
           typeof f["Price Level"] === "number" ? f["Price Level"] : null,
         tags: Array.isArray(f["Tags"]) ? f["Tags"] : [],
         featured: !!f["Featured"],
-        photoRef: f["Photo Ref"] || null,
+        imageUrl: f["Image URL"] || null,
       };
     });
 

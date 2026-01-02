@@ -1,47 +1,17 @@
-// api/place-photo.js
+function renderVenueCard(venue) {
+  const card = document.createElement("article");
+  card.className = "venue-card";
 
-export default async function handler(req, res) {
-  try {
-    const { ref, maxwidth } = req.query || {};
-    const apiKey = process.env.PLACES_API_KEY;
+  const imageHTML = venue.imageUrl
+    ? `<img class="venue-image" src="${venue.imageUrl}" alt="${venue.name || "Venue"}" loading="lazy" />`
+    : "";
 
-    if (!apiKey) {
-      return res
-        .status(500)
-        .json({ error: "Missing PLACES_API_KEY environment variable" });
-    }
+  card.innerHTML = `
+    ${imageHTML}
+    <h3>${venue.name || "Untitled venue"}</h3>
+    <p>${[venue.city, venue.address].filter(Boolean).join(" • ")}</p>
+    ${venue.website ? `<a href="${venue.website.startsWith("http") ? venue.website : "https://" + venue.website}" target="_blank" rel="noopener noreferrer">Visit website</a>` : ""}
+  `;
 
-    if (!ref) {
-      return res.status(400).json({ error: "Missing 'ref' query parameter" });
-    }
-
-    const width = maxwidth || "800";
-
-    const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${encodeURIComponent(
-      width
-    )}&photo_reference=${encodeURIComponent(ref)}&key=${encodeURIComponent(
-      apiKey
-    )}`;
-
-    const photoRes = await fetch(url);
-
-    if (!photoRes.ok) {
-      const text = await photoRes.text();
-      console.error("Photo API error:", photoRes.status, text);
-      return res
-        .status(500)
-        .json({ error: "Failed to fetch photo from Google" });
-    }
-
-    const contentType =
-      photoRes.headers.get("content-type") || "image/jpeg";
-    const buffer = Buffer.from(await photoRes.arrayBuffer());
-
-    res.setHeader("Content-Type", contentType);
-    res.setHeader("Cache-Control", "public, max-age=86400"); // cache 1 day
-    res.status(200).send(buffer);
-  } catch (err) {
-    console.error("place-photo error:", err);
-    res.status(500).json({ error: "Server error" });
-  }
+  return card;
 }
